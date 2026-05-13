@@ -1,0 +1,32 @@
+{% if page_obj.has_other_pages %}
+<div class="flex items-center justify-center gap-1 mt-8">
+
+    {% if page_obj.has_previous %}
+    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.genre %}genre={{ request.GET.genre }}&{% endif %}{% if request.GET.platform %}platform={{ request.GET.platform }}&{% endif %}{% if request.GET.year %}year={{ request.GET.year }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ page_obj.previous_page_number }}"
+       class="flex items-center gap-1 px-3 py-2 text-sm text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition">
+        ← Назад
+    </a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span class="w-9 h-9 flex items-center justify-center text-sm font-semibold bg-violet-600 text-white rounded-lg">
+            {{ num }}
+        </span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.genre %}genre={{ request.GET.genre }}&{% endif %}{% if request.GET.platform %}platform={{ request.GET.platform }}&{% endif %}{% if request.GET.year %}year={{ request.GET.year }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ num }}"
+           class="w-9 h-9 flex items-center justify-center text-sm text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition">
+            {{ num }}
+        </a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.genre %}genre={{ request.GET.genre }}&{% endif %}{% if request.GET.platform %}platform={{ request.GET.platform }}&{% endif %}{% if request.GET.year %}year={{ request.GET.year }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ page_obj.next_page_number }}"
+       class="flex items-center gap-1 px-3 py-2 text-sm text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition">
+        Вперёд →
+    </a>
+    {% endif %}
+
+</div>
+{% endif %}

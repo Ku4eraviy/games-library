@@ -1,0 +1,90 @@
+{% comment %}
+Использование: {% include 'components/game_card.html' with game=game is_favorite=True %}
+{% endcomment %}
+
+<article class="game-card group relative bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 hover:border-violet-500/50">
+
+    <!-- Обложка -->
+    <a href="{% url 'game_detail' game.slug %}" class="block relative aspect-[3/4] overflow-hidden bg-neutral-800">
+        {% with cover=game.get_cover %}
+        {% if cover %}
+            <img src="{{ cover }}" alt="{{ game.title }}"
+                 class="cover-img w-full h-full transition-transform duration-300 group-hover:scale-105" />
+        {% else %}
+            <!-- Плейсхолдер без обложки -->
+            <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-900">
+                <span class="text-4xl mb-2">
+                    {% for genre in game.genres.all|slice:":1" %}{{ genre.icon }}{% empty %}🎮{% endfor %}
+                </span>
+                <span class="text-xs text-neutral-600 text-center px-2">Нет обложки</span>
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Оверлей при наведении -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-4">
+            <span class="text-xs font-medium text-white bg-violet-600 px-3 py-1 rounded-full">Подробнее →</span>
+        </div>
+
+        <!-- Рекомендуемая -->
+        {% if game.is_featured %}
+        <div class="absolute top-2 left-2 bg-violet-600 text-white text-xs font-bold px-2 py-0.5 rounded-md">
+            ★ Топ
+        </div>
+        {% endif %}
+
+        <!-- Рейтинг metacritic -->
+        {% if game.metacritic_score %}
+        <div class="absolute top-2 right-2 {% if game.metacritic_score >= 75 %}bg-green-500{% elif game.metacritic_score >= 50 %}bg-yellow-500{% else %}bg-red-500{% endif %} text-white text-xs font-bold w-8 h-8 rounded-lg flex items-center justify-center shadow-lg">
+            {{ game.metacritic_score }}
+        </div>
+        {% endif %}
+    </a>
+
+    <!-- Информация -->
+    <div class="p-4">
+        <a href="{% url 'game_detail' game.slug %}">
+            <h3 class="font-semibold text-sm text-white leading-tight group-hover:text-violet-300 transition line-clamp-2 mb-1">
+                {{ game.title }}
+            </h3>
+        </a>
+
+        <div class="flex items-center justify-between mt-2">
+            <div class="flex flex-col gap-0.5">
+                {% if game.release_year %}
+                <span class="text-xs text-neutral-500">{{ game.release_year }}</span>
+                {% endif %}
+                <!-- Жанры -->
+                <div class="flex flex-wrap gap-1 mt-1">
+                    {% for genre in game.genres.all|slice:":2" %}
+                    <span class="text-xs bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full">
+                        {{ genre.name }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Кнопка избранного -->
+            {% if user.is_authenticated %}
+            <button
+                class="favorite-btn flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition
+                    {% if game.id in favorite_ids %}text-red-400 bg-red-400/10{% else %}text-neutral-600 hover:text-red-400 hover:bg-red-400/10{% endif %}"
+                data-game-id="{{ game.id }}"
+                title="{% if game.id in favorite_ids %}Убрать из избранного{% else %}Добавить в избранное{% endif %}"
+            >
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="{% if game.id in favorite_ids %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            </button>
+            {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}"
+               class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-neutral-700 hover:text-red-400/50 transition"
+               title="Войдите, чтобы добавить в избранное">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</article>

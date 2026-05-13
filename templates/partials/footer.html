@@ -1,0 +1,29 @@
+<footer class="border-t border-neutral-800 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 bg-violet-600 rounded flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M17 4H7C4.79 4 3 5.79 3 8v8c0 2.21 1.79 4 4 4h10c2.21 0 4-1.79 4-4V8c0-2.21-1.79-4-4-4z" stroke="white" stroke-width="2"/>
+                        <path d="M9 10v4M7 12h4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="15.5" cy="11" r="1" fill="white"/>
+                        <circle cx="17.5" cy="13" r="1" fill="white"/>
+                    </svg>
+                </div>
+                <span class="text-sm font-semibold">Game<span class="text-violet-400">Lib</span></span>
+            </div>
+
+            <p class="text-xs text-neutral-600">
+                © 2025 GameLib — Персональная библиотека игр
+            </p>
+
+            <div class="flex items-center gap-4 text-xs text-neutral-600">
+                <a href="{% url 'game_list' %}" class="hover:text-neutral-400">Каталог</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'favorites' %}" class="hover:text-neutral-400">Избранное</a>
+                {% endif %}
+                <a href="/admin/" class="hover:text-neutral-400">Админ</a>
+            </div>
+        </div>
+    </div>
+</footer>
