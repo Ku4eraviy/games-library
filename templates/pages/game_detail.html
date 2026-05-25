@@ -6,10 +6,10 @@
 
 <!-- Фоновое изображение -->
 <div class="relative">
-    {% with cover=game.get_cover %}
+    {% with cover=game.get_banner %}
     {% if cover %}
     <div class="absolute inset-0 h-[420px] overflow-hidden">
-        <img src="{{ cover }}" alt="" class="w-full h-full object-cover object-top blur-sm opacity-20 scale-105"/>
+        <img src="{{ cover }}" alt="" class="w-full h-full object-cover object-center blur-md opacity-25 scale-105"/>
         <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/60 via-neutral-950/80 to-neutral-950"></div>
     </div>
     {% endif %}

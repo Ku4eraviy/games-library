@@ -1,7 +1,17 @@
 from django.contrib import admin
+from django.db import models
 from django.utils.html import format_html
+from image_uploader_widget.admin import ImageUploaderInline
+from image_uploader_widget.widgets import ImageUploaderWidget
 
 from .models import Game, Genre, Platform, Developer, FavoriteGame, GameScreenshot
+
+
+class ImageAdminMixin:
+    """Виджет предпросмотра изображений в админке (без изменения моделей)."""
+    formfield_overrides = {
+        models.ImageField: {'widget': ImageUploaderWidget},
+    }
 
 
 @admin.register(Genre)
@@ -9,7 +19,6 @@ class GenreAdmin(admin.ModelAdmin):
     list_display = ('icon', 'name', 'slug')
     search_fields = ('name',)
     ordering = ('name',)
-    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(Platform)
@@ -27,14 +36,14 @@ class DeveloperAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
-class GameScreenshotInline(admin.TabularInline):
+class GameScreenshotInline(ImageUploaderInline):
     model = GameScreenshot
     extra = 2
     fields = ('image', 'caption', 'order')
 
 
 @admin.register(Game)
-class GameAdmin(admin.ModelAdmin):
+class GameAdmin(ImageAdminMixin, admin.ModelAdmin):
     list_display = (
         'cover_thumbnail', 'title', 'developer', 'release_year',
         'age_rating', 'metacritic_score', 'is_featured'
@@ -43,7 +52,6 @@ class GameAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description', 'developer__name')
     list_filter = ('genres', 'platforms', 'release_year', 'age_rating', 'is_featured')
     ordering = ('-release_year', 'title')
-    prepopulated_fields = {'slug': ('title',)}
     filter_horizontal = ('genres', 'platforms')
     list_editable = ('is_featured',)
     inlines = [GameScreenshotInline]
@@ -84,7 +92,7 @@ class FavoriteGameAdmin(admin.ModelAdmin):
 
 
 @admin.register(GameScreenshot)
-class GameScreenshotAdmin(admin.ModelAdmin):
+class GameScreenshotAdmin(ImageAdminMixin, admin.ModelAdmin):
     list_display = ('game', 'caption', 'order')
     search_fields = ('game__title', 'caption')
     list_filter = ('game',)

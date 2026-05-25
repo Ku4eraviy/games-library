@@ -4,77 +4,9 @@
 
 {% block content %}
 
-<!-- Hero секция с рекомендуемыми играми -->
-{% if featured_games and not search_query and not selected_genre and not selected_platform and not selected_year %}
-<section class="relative overflow-hidden bg-neutral-950 border-b border-neutral-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div class="flex items-center gap-2 mb-6">
-            <span class="text-violet-400 text-sm font-medium uppercase tracking-widest">★ Рекомендуем</span>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            <!-- Главная рекомендуемая игра -->
-            {% with hero=featured_games.0 %}
-            <div class="lg:col-span-3 relative rounded-2xl overflow-hidden aspect-video group">
-                {% with cover=hero.get_cover %}
-                {% if cover %}
-                <img src="{{ cover }}" alt="{{ hero.title }}"
-                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
-                {% else %}
-                <div class="w-full h-full bg-gradient-to-br from-violet-900 to-neutral-900 flex items-center justify-center">
-                    <span class="text-7xl">🎮</span>
-                </div>
-                {% endif %}
-                {% endwith %}
-                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent">
-                    <div class="absolute bottom-0 left-0 right-0 p-6">
-                        <div class="flex flex-wrap gap-1.5 mb-2">
-                            {% for genre in hero.genres.all|slice:":3" %}
-                            <span class="text-xs bg-violet-600/80 text-white px-2 py-0.5 rounded-full">{{ genre.name }}</span>
-                            {% endfor %}
-                        </div>
-                        <h2 class="text-2xl font-bold text-white mb-1">{{ hero.title }}</h2>
-                        {% if hero.short_description %}
-                        <p class="text-sm text-neutral-300 mb-4 line-clamp-2">{{ hero.short_description }}</p>
-                        {% endif %}
-                        <a href="{% url 'game_detail' hero.slug %}"
-                           class="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">
-                            Смотреть
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% endwith %}
-
-            <!-- Мини-карточки остальных -->
-            <div class="lg:col-span-2 grid grid-cols-2 gap-4">
-                {% for game in featured_games|slice:"1:5" %}
-                <a href="{% url 'game_detail' game.slug %}"
-                   class="relative rounded-xl overflow-hidden group aspect-[4/5] bg-neutral-900">
-                    {% with cover=game.get_cover %}
-                    {% if cover %}
-                    <img src="{{ cover }}" alt="{{ game.title }}"
-                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"/>
-                    {% else %}
-                    <div class="w-full h-full bg-gradient-to-br from-violet-900 to-neutral-900 flex items-center justify-center">
-                        <span class="text-3xl">🎮</span>
-                    </div>
-                    {% endif %}
-                    {% endwith %}
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent">
-                        <div class="absolute bottom-0 p-3">
-                            <p class="text-xs font-semibold text-white leading-tight">{{ game.title }}</p>
-                        </div>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</section>
+<!-- EA-style горизонтальная карусель -->
+{% if banner_games and not search_query and not selected_genre and not selected_platform and not selected_year %}
+    {% include 'components/hero_banner.html' %}
 {% endif %}
 
 <!-- Основной каталог -->
@@ -141,7 +73,6 @@
 
 {% block extra_scripts %}
 <script>
-// Обработка избранного
 document.addEventListener('click', function(e) {
     const btn = e.target.closest('.favorite-btn');
     if (!btn) return;

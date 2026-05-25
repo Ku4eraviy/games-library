@@ -74,8 +74,12 @@ def game_list(request):
             FavoriteGame.objects.filter(user=request.user).values_list('game_id', flat=True)
         )
 
-    # Рекомендуемые игры (для hero-секции)
-    featured_games = Game.objects.filter(is_featured=True).select_related('developer')[:5]
+    # Карусель баннеров (все игры с обложкой, EA-style)
+    banner_games = list(
+        Game.objects.select_related('developer')
+        .prefetch_related('genres')
+        .order_by('-is_featured', '-release_year')[:24]
+    )
 
     context = {
         'page_obj': page_obj,
@@ -88,7 +92,7 @@ def game_list(request):
         'selected_year': year,
         'selected_sort': sort,
         'favorite_ids': favorite_ids,
-        'featured_games': featured_games,
+        'banner_games': banner_games,
         'total_count': paginator.count,
     }
     return render(request, 'pages/game_list.html', context)

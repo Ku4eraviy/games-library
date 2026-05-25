@@ -1,3 +1,7 @@
 Django==4.2.16
-psycopg2-binary==2.9.9
+psycopg2-binary>=2.9.9
 Pillow==10.4.0
+django-autoslug==1.9.9
+django-image-uploader-widget==1.1.1
+faker==40.19.1
+pytils==0.4.4

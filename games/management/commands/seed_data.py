@@ -1,32 +1,30 @@
 """
 Команда для наполнения БД тестовыми данными.
 Запуск: python manage.py seed_data
+       python manage.py seed_data --extra 20
 """
+import random
+from datetime import date
+
 from django.core.management.base import BaseCommand
+from faker import Faker
+
+from games.cover_urls import get_cover_url
 from games.models import Genre, Platform, Developer, Game
 
+fake = Faker('ru_RU')
 
 GENRES = [
-    {'name': 'Экшен', 'slug': 'action', 'icon': '⚔️',
-     'description': 'Игры с активным геймплеем, боевыми системами и динамикой'},
-    {'name': 'РПГ', 'slug': 'rpg', 'icon': '🧙',
-     'description': 'Ролевые игры с прокачкой персонажа и нелинейным сюжетом'},
-    {'name': 'Стратегия', 'slug': 'strategy', 'icon': '♟️',
-     'description': 'Тактические и стратегические игры'},
-    {'name': 'Шутер', 'slug': 'shooter', 'icon': '🔫',
-     'description': 'Игры от первого и третьего лица'},
-    {'name': 'Приключения', 'slug': 'adventure', 'icon': '🗺️',
-     'description': 'Исследование миров и решение головоломок'},
-    {'name': 'Спорт', 'slug': 'sports', 'icon': '⚽',
-     'description': 'Спортивные симуляторы'},
-    {'name': 'Гонки', 'slug': 'racing', 'icon': '🏎️',
-     'description': 'Гоночные симуляторы и аркады'},
-    {'name': 'Инди', 'slug': 'indie', 'icon': '🌱',
-     'description': 'Независимые авторские проекты'},
-    {'name': 'Хоррор', 'slug': 'horror', 'icon': '👻',
-     'description': 'Игры ужасов и выживания'},
-    {'name': 'Файтинг', 'slug': 'fighting', 'icon': '🥊',
-     'description': 'Боевые игры один на один'},
+    {'name': 'Экшен', 'slug': 'action', 'icon': '⚔️'},
+    {'name': 'РПГ', 'slug': 'rpg', 'icon': '🧙'},
+    {'name': 'Стратегия', 'slug': 'strategy', 'icon': '♟️'},
+    {'name': 'Шутер', 'slug': 'shooter', 'icon': '🔫'},
+    {'name': 'Приключения', 'slug': 'adventure', 'icon': '🗺️'},
+    {'name': 'Спорт', 'slug': 'sports', 'icon': '⚽'},
+    {'name': 'Гонки', 'slug': 'racing', 'icon': '🏎️'},
+    {'name': 'Инди', 'slug': 'indie', 'icon': '🌱'},
+    {'name': 'Хоррор', 'slug': 'horror', 'icon': '👻'},
+    {'name': 'Файтинг', 'slug': 'fighting', 'icon': '🥊'},
 ]
 
 PLATFORMS = [
@@ -54,6 +52,7 @@ DEVELOPERS = [
     {'name': 'Santa Monica Studio', 'country': 'США', 'founded_year': 1999},
 ]
 
+# Названия из подготовленного списка (ключевые хиты)
 GAMES = [
     {
         'title': 'The Witcher 3: Wild Hunt',
@@ -67,8 +66,6 @@ GAMES = [
         'metacritic_score': 93,
         'is_featured': True,
         'cover_url': 'https://image.api.playstation.com/vulcan/ap/rnd/202211/0711/kh4MQLEk8QME9GKcMRR5mRSF.png',
-        'short_description': 'Эпическая ролевая игра в открытом мире с богатым нарративом и запоминающимися персонажами.',
-        'description': 'The Witcher 3: Wild Hunt — это ролевая игра в открытом мире, действие которой происходит в визуально потрясающей фэнтезийной вселенной, наполненной значимыми выборами и последствиями.\n\nВы играете за Геральта из Ривии — профессионального охотника на монстров. Ищите свою пропавшую приёмную дочь Цири, скрывающуюся от могущественной группировки, известной как Дикая Охота.',
     },
     {
         'title': 'Elden Ring',
@@ -82,8 +79,6 @@ GAMES = [
         'metacritic_score': 96,
         'is_featured': True,
         'cover_url': 'https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/phvVT0qZfcRms5qDAk0SI3CM.png',
-        'short_description': 'Эпическое ролевое приключение в огромном тёмном фэнтезийном мире, созданном совместно с Джорджем Р. Р. Мартином.',
-        'description': 'Elden Ring — это масштабная ролевая игра, разработанная FromSoftware совместно с Джорджем Р. Р. Мартином.\n\nОткройте для себя великолепный открытый мир — Земли Промеж, наполненный грозными врагами, скрытыми тайнами и запутанной историей. Создайте собственного персонажа и стройте уникальные билды.',
     },
     {
         'title': 'Red Dead Redemption 2',
@@ -97,8 +92,6 @@ GAMES = [
         'metacritic_score': 97,
         'is_featured': True,
         'cover_url': 'https://image.api.playstation.com/cdn/UP1004/CUSA03041_00/Hpl5MtwQgOVF9vJqlfui6SDB5Jl4oBSq.png',
-        'short_description': 'Иммерсивный западный эпос об уходящей эпохе и цене лояльности.',
-        'description': 'Америка, 1899 год. Эпоха дикого запада подходит к концу. Артур Морган и банда Ван дер Линде вынуждены скрываться после неудачного ограбления в городке Блэкуотер.\n\nОткрытый мир с невероятной детализацией, живыми экосистемами и глубокой системой чести.',
     },
     {
         'title': 'The Last of Us Part I',
@@ -112,8 +105,6 @@ GAMES = [
         'metacritic_score': 89,
         'is_featured': True,
         'cover_url': 'https://image.api.playstation.com/vulcan/ap/rnd/202206/0720/eEczyEMDd2BLa3dtkGJVE9Id.png',
-        'short_description': 'Переосмысление культовой постапокалиптической истории о выживании и человечности.',
-        'description': 'История о выживании в постапокалиптическом мире, захваченном грибковой инфекцией. Джоэл и Элли вынуждены пересечь разрушенную Америку.\n\nРемастер с полностью переработанной графикой, геймплеем и анимациями на движке The Last of Us Part II.',
     },
     {
         'title': 'The Legend of Zelda: Tears of the Kingdom',
@@ -127,8 +118,6 @@ GAMES = [
         'metacritic_score': 96,
         'is_featured': True,
         'cover_url': 'https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/en_US/games/switch/t/the-legend-of-zelda-tears-of-the-kingdom-switch/hero',
-        'short_description': 'Сиквел Breath of the Wild с новыми островами в небесах и революционными механиками строительства.',
-        'description': 'Линк исследует не только знакомую Хайрул, но и парящие острова в небе, и мрачные глубины под землёй.\n\nНовые силы — Ультрарука, Соединение, Возврат и Скольжение — открывают бесчисленные возможности для решения головоломок и создания механизмов.',
     },
     {
         'title': 'Half-Life: Alyx',
@@ -142,8 +131,6 @@ GAMES = [
         'metacritic_score': 93,
         'is_featured': False,
         'cover_url': 'https://cdn.akamai.steamstatic.com/steam/apps/546560/library_600x900.jpg',
-        'short_description': 'Возвращение в Half-Life вселенную через VR — переломный момент в истории виртуальной реальности.',
-        'description': 'Half-Life: Alyx — VR-приключение, действие которого происходит между событиями Half-Life и Half-Life 2.\n\nАликс Вэнс ведёт борьбу людей против Альянса. Игра переизобрела возможности VR, показав, каким может быть полноценный VR-проект AAA-класса.',
     },
     {
         'title': 'Hades',
@@ -157,8 +144,6 @@ GAMES = [
         'metacritic_score': 93,
         'is_featured': False,
         'cover_url': 'https://image.api.playstation.com/vulcan/ap/rnd/202012/1618/TgtpOqBzLLBYjPXgZEnmGXyI.png',
-        'short_description': 'Roguelike-экшен о сыне бога подземного царства, пытающемся сбежать из Аида.',
-        'description': 'Hades — это roguelike от создателей Bastion, Transistor и Pyre. Вы играете за Загрея, сына Аида, вырывающегося из подземного царства.\n\nКаждый забег уникален. Благодаря нелинейному повествованию история развивается при каждом прохождении.',
     },
     {
         'title': 'Marvel\'s Spider-Man 2',
@@ -172,8 +157,6 @@ GAMES = [
         'metacritic_score': 90,
         'is_featured': False,
         'cover_url': 'https://image.api.playstation.com/vulcan/ap/rnd/202306/1219/1c7b75d8ed9271516546560f219ad0f9d2a0e09b45e8fba3.png',
-        'short_description': 'Питер Паркер и Майлз Моралес вместе против нового угрозы — Венома.',
-        'description': 'Продолжение цикла Insomniac про Человека-Паука. Питер Паркер и Майлз Моралес объединяются против угрозы симбиота.\n\nНовые костюмы, способности, расширенный Нью-Йорк и захватывающий сюжет о цене силы.',
     },
     {
         'title': 'Starfield',
@@ -187,8 +170,6 @@ GAMES = [
         'metacritic_score': 83,
         'is_featured': False,
         'cover_url': 'https://upload.wikimedia.org/wikipedia/en/2/24/Starfield_game_cover.jpg',
-        'short_description': 'Первая новая вселенная Bethesda за 25 лет — масштабная космическая RPG.',
-        'description': 'В 2330 году человечество вышло за пределы Солнечной системы. Вы — исследователь организации Созвездие, которая ищет ответы на главный вопрос: одни ли мы во вселенной?\n\nОткройте сотни планет, стройте корабли и создавайте уникальных персонажей.',
     },
     {
         'title': 'God of War Ragnarök',
@@ -202,19 +183,63 @@ GAMES = [
         'metacritic_score': 94,
         'is_featured': False,
         'cover_url': 'https://image.api.playstation.com/vulcan/ap/rnd/202207/1210/4xJ8XB3bi888QTLZYdl7Oi0s.png',
-        'short_description': 'Кратос и Атрей встречают Рагнарёк — история о семье, судьбе и богах Скандинавии.',
-        'description': 'Продолжение God of War 2018 года. Кратос и Атрей путешествуют по Девяти Мирам, сталкиваясь с норвежскими богами и надвигающимся Рагнарёком.\n\nГлубокая боевая система, эмоциональный нарратив и невероятные декорации делают игру одним из лучших эксклюзивов PlayStation.',
     },
 ]
 
+# Дополнительные названия для массового наполнения (описания — через Faker)
+EXTRA_GAME_TITLES = [
+    'Metro Exodus', 'Сталкер 2: Сердце Чернобыля', 'Baldur\'s Gate 3',
+    'Cyberpunk 2077', 'Horizon Forbidden West', 'Ghost of Tsushima',
+    'Sekiro: Shadows Die Twice', 'Dark Souls III', 'Bloodborne',
+    'Resident Evil 4', 'Dead Space', 'Alan Wake 2',
+    'Control', 'Disco Elysium', 'Persona 5 Royal',
+    'Final Fantasy XVI', 'Monster Hunter Rise', 'Doom Eternal',
+    'Forza Horizon 5', 'Gran Turismo 7', 'FIFA 24',
+    'NBA 2K24', 'Street Fighter 6', 'Tekken 8',
+    'Civilization VI', 'Total War: Warhammer III', 'Crusader Kings III',
+    'Stardew Valley', 'Hollow Knight', 'Celeste',
+    'Undertale', 'Portal 2', 'Half-Life 2',
+    'BioShock Infinite', 'Mass Effect Legendary Edition',
+    'Dragon Age: Inquisition', 'Fallout 4', 'Skyrim',
+    'Assassin\'s Creed Valhalla', 'Far Cry 6', 'Watch Dogs: Legion',
+]
+
+AGE_RATINGS = ['0+', '6+', '12+', '16+', '18+']
+
 
 class Command(BaseCommand):
-    help = 'Заполнить базу данных тестовыми играми и жанрами'
+    help = 'Заполнить базу данных тестовыми играми и жанрами (Faker + подготовленные списки)'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--extra',
+            type=int,
+            default=15,
+            help='Сколько дополнительных игр сгенерировать из списка названий (по умолчанию 15)',
+        )
 
     def handle(self, *args, **kwargs):
+        extra_count = kwargs['extra']
         self.stdout.write('🎮 Начинаем заполнение базы данных...\n')
 
-        # Жанры
+        genre_map = self._seed_genres()
+        self.stdout.write('')
+        platform_map = self._seed_platforms()
+        self.stdout.write('')
+        dev_map = self._seed_developers()
+        self.stdout.write('')
+        self._seed_featured_games(genre_map, platform_map, dev_map)
+        self.stdout.write('')
+        created_extra = self._seed_extra_games(
+            extra_count, genre_map, platform_map, dev_map
+        )
+        self.stdout.write(f'\n  Дополнительно сгенерировано игр: {created_extra}')
+        self._apply_covers()
+        self.stdout.write('\n✅ Готово! База данных заполнена.\n')
+        self.stdout.write('Теперь создайте суперпользователя:')
+        self.stdout.write('  python manage.py createsuperuser\n')
+
+    def _seed_genres(self):
         genre_map = {}
         for g in GENRES:
             obj, created = Genre.objects.get_or_create(
@@ -222,29 +247,27 @@ class Command(BaseCommand):
                 defaults={
                     'name': g['name'],
                     'icon': g['icon'],
-                    'description': g['description'],
-                }
+                    'description': fake.text(max_nb_chars=200),
+                },
             )
             genre_map[g['slug']] = obj
             status = '✓ создан' if created else '· уже есть'
             self.stdout.write(f'  Жанр {g["icon"]} {g["name"]}: {status}')
+        return genre_map
 
-        self.stdout.write('')
-
-        # Платформы
+    def _seed_platforms(self):
         platform_map = {}
         for p in PLATFORMS:
             obj, created = Platform.objects.get_or_create(
                 name=p['name'],
-                defaults={'short_name': p['short_name']}
+                defaults={'short_name': p['short_name']},
             )
             platform_map[p['short_name']] = obj
             status = '✓ создана' if created else '· уже есть'
             self.stdout.write(f'  Платформа {p["short_name"]}: {status}')
+        return platform_map
 
-        self.stdout.write('')
-
-        # Разработчики
+    def _seed_developers(self):
         dev_map = {}
         for d in DEVELOPERS:
             obj, created = Developer.objects.get_or_create(
@@ -252,16 +275,23 @@ class Command(BaseCommand):
                 defaults={
                     'country': d['country'],
                     'founded_year': d['founded_year'],
-                }
+                },
             )
             dev_map[d['name']] = obj
             status = '✓ создан' if created else '· уже есть'
             self.stdout.write(f'  Разработчик {d["name"]}: {status}')
+        return dev_map
 
-        self.stdout.write('')
+    def _faker_game_text(self):
+        """Описания и прочие текстовые поля — через Faker."""
+        short = fake.paragraph(nb_sentences=2)
+        if len(short) > 300:
+            short = short[:297] + '...'
+        return short, fake.text(max_nb_chars=1200)
 
-        # Игры
+    def _seed_featured_games(self, genre_map, platform_map, dev_map):
         for g in GAMES:
+            short_desc, description = self._faker_game_text()
             game, created = Game.objects.get_or_create(
                 slug=g['slug'],
                 defaults={
@@ -272,17 +302,15 @@ class Command(BaseCommand):
                     'age_rating': g['age_rating'],
                     'metacritic_score': g['metacritic_score'],
                     'is_featured': g['is_featured'],
-                    'cover_url': g.get('cover_url', ''),
-                    'short_description': g.get('short_description', ''),
-                    'description': g.get('description', ''),
-                }
+                    'cover_url': get_cover_url(slug=g['slug'], title=g['title']) or '',
+                    'short_description': short_desc,
+                    'description': description,
+                },
             )
             if created:
-                # Жанры
                 for genre_slug in g['genres']:
                     if genre_slug in genre_map:
                         game.genres.add(genre_map[genre_slug])
-                # Платформы
                 for platform_short in g['platforms']:
                     if platform_short in platform_map:
                         game.platforms.add(platform_map[platform_short])
@@ -290,6 +318,55 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'  · Уже есть: {g["title"]}')
 
-        self.stdout.write('\n✅ Готово! База данных заполнена.\n')
-        self.stdout.write('Теперь создайте суперпользователя:')
-        self.stdout.write('  python manage.py createsuperuser\n')
+    def _seed_extra_games(self, count, genre_map, platform_map, dev_map):
+        titles = random.sample(
+            EXTRA_GAME_TITLES,
+            min(count, len(EXTRA_GAME_TITLES)),
+        )
+        genre_slugs = list(genre_map.keys())
+        platform_keys = list(platform_map.keys())
+        dev_list = list(dev_map.values())
+        created = 0
+
+        for title in titles:
+            if Game.objects.filter(title=title).exists():
+                continue
+
+            release_year = fake.random_int(min=2010, max=2024)
+            short_desc, description = self._faker_game_text()
+            game = Game(
+                title=title,
+                developer=random.choice(dev_list) if dev_list else None,
+                release_year=release_year,
+                release_date=date(release_year, fake.random_int(1, 12), fake.random_int(1, 28)),
+                age_rating=random.choice(AGE_RATINGS),
+                metacritic_score=fake.random_int(min=55, max=99),
+                is_featured=fake.boolean(chance_of_getting_true=20),
+                cover_url='',
+                short_description=short_desc,
+                description=description,
+            )
+            game.save()
+            cover = get_cover_url(slug=game.slug, title=game.title)
+            if cover:
+                game.cover_url = cover
+                game.save(update_fields=['cover_url'])
+
+            for slug in random.sample(genre_slugs, k=random.randint(1, 3)):
+                game.genres.add(genre_map[slug])
+            for key in random.sample(platform_keys, k=random.randint(1, 4)):
+                game.platforms.add(platform_map[key])
+
+            created += 1
+            self.stdout.write(f'  ✓ Faker: {title} (slug: {game.slug})')
+
+        return created
+
+    def _apply_covers(self):
+        """Проставить обложки всем играм (без случайных картинок Faker)."""
+        self.stdout.write('\n  Обновление обложек...')
+        for game in Game.objects.all():
+            cover = get_cover_url(slug=game.slug, title=game.title)
+            if cover and game.cover_url != cover:
+                game.cover_url = cover
+                game.save(update_fields=['cover_url'])

@@ -1,11 +1,17 @@
 from django.db import models
 from django.conf import settings
+from autoslug import AutoSlugField
 
 
 class Genre(models.Model):
     """Жанр игры."""
     name = models.CharField(max_length=100, unique=True, verbose_name='Название')
-    slug = models.SlugField(max_length=100, unique=True, verbose_name='Slug')
+    slug = AutoSlugField(
+        populate_from='name',
+        max_length=100,
+        unique=True,
+        verbose_name='Slug',
+    )
     description = models.TextField(blank=True, verbose_name='Описание')
     icon = models.CharField(max_length=50, blank=True, default='🎮', verbose_name='Иконка (эмодзи)')
 
@@ -59,7 +65,12 @@ class Game(models.Model):
     ]
 
     title = models.CharField(max_length=200, verbose_name='Название')
-    slug = models.SlugField(max_length=200, unique=True, verbose_name='Slug')
+    slug = AutoSlugField(
+        populate_from='title',
+        max_length=200,
+        unique=True,
+        verbose_name='Slug',
+    )
 
     # Связи
     genres = models.ManyToManyField(
@@ -130,12 +141,18 @@ class Game(models.Model):
         return self.title
 
     def get_cover(self):
-        """Возвращает URL обложки (из файла или URL-поля)."""
+        """Возвращает URL обложки (файл → cover_url → каталог Steam/PS)."""
         if self.cover:
             return self.cover.url
         if self.cover_url:
             return self.cover_url
-        return None
+        from .cover_urls import get_cover_url
+        return get_cover_url(slug=self.slug, title=self.title)
+
+    def get_banner(self):
+        """Широкий баннер для карусели (EA-style)."""
+        from .cover_urls import get_banner_url
+        return get_banner_url(slug=self.slug, title=self.title) or self.get_cover()
 
     def get_score_color(self):
         """Цвет оценки Metacritic."""

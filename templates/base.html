@@ -82,10 +82,70 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
+
+        /* EA-style карусель — только визуал, без взаимодействия */
+        .ea-banner {
+            pointer-events: none;
+            user-select: none;
+        }
+        .ea-banner-track {
+            width: max-content;
+            animation: ea-scroll 45s linear infinite;
+        }
+        @keyframes ea-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ea-banner-track { animation: none; }
+        }
+
+        /* Полоска загрузки страницы */
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 99999;
+            height: 3px;
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        #page-loader.is-done {
+            opacity: 0;
+        }
+        #page-loader-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #6d28d9, #8b5cf6, #ec4899, #a78bfa, #6d28d9);
+            background-size: 200% 100%;
+            animation: loader-shimmer 1.2s linear infinite;
+            box-shadow: 0 0 14px rgba(139, 92, 246, 0.9), 0 0 4px rgba(236, 72, 153, 0.6);
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes loader-shimmer {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        body.is-loading main,
+        body.is-loading header {
+            opacity: 0;
+        }
+        body.is-ready main,
+        body.is-ready header {
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col is-loading">
+
+    <!-- Полоска загрузки -->
+    <div id="page-loader" aria-hidden="true">
+        <div id="page-loader-bar"></div>
+    </div>
 
     <!-- Навигация -->
     {% include 'partials/header.html' %}
@@ -116,6 +176,67 @@
     {% include 'partials/footer.html' %}
 
     <script>
+        // Полоска загрузки при открытии / переходе по сайту
+        (function () {
+            const loader = document.getElementById('page-loader');
+            const bar = document.getElementById('page-loader-bar');
+            if (!loader || !bar) return;
+
+            let progress = 0;
+            let timer = null;
+
+            function setProgress(value) {
+                progress = Math.min(value, 100);
+                bar.style.width = progress + '%';
+            }
+
+            function tick() {
+                if (progress < 85) {
+                    const step = progress < 30 ? 8 : progress < 60 ? 4 : 2;
+                    setProgress(progress + step * Math.random());
+                }
+            }
+
+            timer = setInterval(tick, 120);
+
+            function finish() {
+                clearInterval(timer);
+                setProgress(100);
+                loader.classList.add('is-done');
+                document.body.classList.remove('is-loading');
+                document.body.classList.add('is-ready');
+                setTimeout(function () {
+                    loader.remove();
+                }, 550);
+            }
+
+            if (document.readyState === 'complete') {
+                finish();
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    setProgress(Math.max(progress, 55));
+                });
+                window.addEventListener('load', finish);
+                setTimeout(finish, 8000);
+            }
+
+            document.addEventListener('click', function (e) {
+                const link = e.target.closest('a[href]');
+                if (!link || link.target === '_blank') return;
+                const href = link.getAttribute('href') || '';
+                if (href.startsWith('#') || href.startsWith('javascript:')) return;
+                if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                document.body.classList.remove('is-ready');
+                document.body.classList.add('is-loading');
+                const old = document.getElementById('page-loader');
+                if (old) old.remove();
+                const el = document.createElement('div');
+                el.id = 'page-loader';
+                el.innerHTML = '<div id="page-loader-bar" style="width:40%"></div>';
+                document.body.prepend(el);
+            });
+        })();
+
         // Убираем уведомления через 3 секунды
         setTimeout(() => {
             const container = document.getElementById('messages-container');

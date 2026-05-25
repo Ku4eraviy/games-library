@@ -27,16 +27,23 @@ CustomUser ←FK→ FavoriteGame ←FK→ Game
 
 ## Быстрый старт
 
-### 1. Создать виртуальное окружение
+### 1. Окружение и зависимости
+
+Используется **одна** папка `venv/` (не создавайте `.venv` — будет путаница).
+
+**Windows (PowerShell):**
+```powershell
+cd gamelib
+.\setup.ps1
+venv\Scripts\activate
+```
+
+**Вручную:**
 ```bash
 cd gamelib
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
-```
-
-### 2. Установить зависимости
-```bash
 pip install -r requirements.txt
 ```
 
