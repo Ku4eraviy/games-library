@@ -14,7 +14,11 @@ def _steam(appid: int) -> dict:
     }
 
 
-# slug → steam appid или явные URL
+#
+# slug → данные обложек. Для большинства игр используем Steam CDN
+# через _steam(appid). Для нестабильных или не-стимовых игр
+# задаём прямые URL вручную.
+#
 COVER_BY_SLUG: dict[str, dict] = {
     'witcher-3': _steam(292030),
     'elden-ring': _steam(1245620),
@@ -69,13 +73,21 @@ COVER_BY_SLUG: dict[str, dict] = {
     },
     'gran-turismo-7': {
         'cover': 'https://image.api.playstation.com/vulcan/ap/rnd/202202/2501/L2p2xDevKnZPsOj3X0Q2m1z.png',
-        'banner': 'https://image.api.playstation.com/games/images/tachyon/000/001/360/0000013600.jpg',
+        'banner': 'https://gmedia.playstation.com/is/image/SIEPDC/gran-turismo-7-screenshot-01-en-27jan22?$2400px--t$',
     },
-    'stalker-2': _steam(1151340),
+    # S.T.A.L.K.E.R. 2 — ручные ссылки, чтобы не было путаницы с Fallout
+    'stalker-2': {
+        'cover': 'https://cdn.akamai.steamstatic.com/steam/apps/1151340/library_600x900_2x.jpg',
+        'banner': 'https://cdn.akamai.steamstatic.com/steam/apps/1151340/library_hero_2x.jpg',
+    },
     'fifa-24': _steam(2195250),
     'nba-2k24': _steam(2338770),
     'total-war-warhammer-iii': _steam(1142710),
-    'alan-wake-2': _steam(2059540),
+    # Alan Wake 2 — Epic/console, берём проверенные картинки
+    'alan-wake-2': {
+        'cover': 'https://image.api.playstation.com/vulcan/ap/rnd/202308/0221/3Wvywgq6Z9eruqbWtaXDpK0N.png',
+        'banner': 'https://image.api.playstation.com/vulcan/ap/rnd/202310/1919/6l0RRqtD9h5pz50jdK5Zk90k.png',
+    },
 }
 
 # Заголовок (lower) → slug в COVER_BY_SLUG

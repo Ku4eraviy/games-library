@@ -134,6 +134,89 @@
             0% { background-position: 100% 0; }
             100% { background-position: -100% 0; }
         }
+        /* Центральный оверлей загрузки */
+        #page-loader-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99990;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top, rgba(139, 92, 246, 0.12), transparent 55%),
+                        radial-gradient(circle at bottom, rgba(24, 24, 27, 0.92), rgba(15, 15, 15, 0.98));
+            opacity: 1;
+            transition: opacity 0.4s ease;
+        }
+        #page-loader-overlay.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .page-loader-card {
+            min-width: 260px;
+            max-width: 360px;
+            padding: 20px 24px;
+            border-radius: 18px;
+            background: rgba(38, 38, 38, 0.96);
+            border: 1px solid rgba(148, 163, 184, 0.32);
+            box-shadow:
+                0 18px 38px rgba(0, 0, 0, 0.6),
+                0 0 35px rgba(139, 92, 246, 0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .page-loader-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 0%, #a855f7, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 0 18px rgba(168, 85, 247, 0.7),
+                0 0 6px rgba(236, 72, 153, 0.6);
+        }
+        .page-loader-spinner {
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            border-width: 2px;
+            border-style: solid;
+            border-color: rgba(248, 250, 252, 0.1);
+            border-top-color: #e879f9;
+            animation: spin 0.75s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .page-loader-bar {
+            position: relative;
+            width: 100%;
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.8);
+            overflow: hidden;
+        }
+        .page-loader-bar-inner {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #4f46e5, #a855f7, #ec4899, #22d3ee);
+            background-size: 200% 100%;
+            transform-origin: left;
+            transform: scaleX(0);
+            animation: loader-shimmer 1.2s linear infinite;
+        }
+        .page-loader-text-main {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .page-loader-text-sub {
+            font-size: 0.75rem;
+            color: #a1a1aa;
+        }
+
         body.is-loading main,
         body.is-loading header {
             opacity: 0;
@@ -151,6 +234,26 @@
     <!-- Полоска загрузки -->
     <div id="page-loader" aria-hidden="true">
         <div id="page-loader-bar"></div>
+    </div>
+
+    <!-- Центральный лоадер -->
+    <div id="page-loader-overlay" aria-hidden="true">
+        <div class="page-loader-card">
+            <div class="flex items-center gap-3">
+                <div class="page-loader-icon">
+                    <div class="page-loader-spinner"></div>
+                </div>
+                <div>
+                    <div class="page-loader-text-main">GameLib загружается…</div>
+                    <div class="page-loader-text-sub" id="page-loader-sub">
+                        Собираем каталог игр и обложки
+                    </div>
+                </div>
+            </div>
+            <div class="page-loader-bar">
+                <div class="page-loader-bar-inner" id="page-loader-bar-inner"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Навигация -->
@@ -186,7 +289,9 @@
         (function () {
             const loader = document.getElementById('page-loader');
             const bar = document.getElementById('page-loader-bar');
-            if (!loader || !bar) return;
+            const overlay = document.getElementById('page-loader-overlay');
+            const overlayBar = document.getElementById('page-loader-bar-inner');
+            if (!loader || !bar || !overlay || !overlayBar) return;
 
             let progress = 0;
             let timer = null;
@@ -194,6 +299,7 @@
             function setProgress(value) {
                 progress = Math.min(value, 100);
                 bar.style.width = progress + '%';
+                overlayBar.style.transform = 'scaleX(' + (progress / 100) + ')';
             }
 
             function tick() {
@@ -209,10 +315,12 @@
                 clearInterval(timer);
                 setProgress(100);
                 loader.classList.add('is-done');
+                overlay.classList.add('is-hidden');
                 document.body.classList.remove('is-loading');
                 document.body.classList.add('is-ready');
                 setTimeout(function () {
                     loader.remove();
+                    overlay.remove();
                 }, 550);
             }
 
