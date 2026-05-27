@@ -10,7 +10,7 @@
     {% if cover %}
     <div class="absolute inset-0 h-[420px] overflow-hidden">
         <img src="{{ cover }}" alt="" class="w-full h-full object-cover object-center blur-md opacity-25 scale-105"/>
-        <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/60 via-neutral-950/80 to-neutral-950"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-site-bg/60 via-site-bg/80 to-site-bg"></div>
     </div>
     {% endif %}
     {% endwith %}
@@ -32,12 +32,12 @@
 
             <!-- Обложка -->
             <div class="flex flex-col gap-4">
-                <div class="rounded-2xl overflow-hidden shadow-2xl shadow-black/50 aspect-[3/4] bg-neutral-900 border border-neutral-800">
+                <div class="rounded-2xl overflow-hidden shadow-2xl shadow-black/50 aspect-[3/4] bg-site-surface border border-site-border">
                     {% with cover=game.get_cover %}
                     {% if cover %}
                     <img src="{{ cover }}" alt="{{ game.title }}" class="w-full h-full object-cover object-top"/>
                     {% else %}
-                    <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-900">
+                    <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-site-elevated to-site-surface">
                         <span class="text-6xl mb-3">
                             {% for genre in game.genres.all|slice:":1" %}{{ genre.icon }}{% empty %}🎮{% endfor %}
                         </span>
@@ -52,7 +52,7 @@
                 <button id="favorite-btn"
                     class="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold transition
                         {% if is_favorite %}bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500/30
-                        {% else %}bg-neutral-800 text-neutral-300 border border-neutral-700 hover:text-red-400 hover:border-red-500/40{% endif %}"
+                        {% else %}bg-site-elevated text-neutral-300 border border-site-border hover:text-red-400 hover:border-red-500/40{% endif %}"
                     data-game-id="{{ game.id }}"
                     data-is-favorite="{{ is_favorite|yesno:'true,false' }}">
                     <svg class="w-4 h-4" viewBox="0 0 24 24"
@@ -64,7 +64,7 @@
                 </button>
                 {% else %}
                 <a href="{% url 'login' %}?next={{ request.path }}"
-                   class="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold bg-neutral-800 text-neutral-400 border border-neutral-700 hover:text-white transition">
+                   class="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold bg-site-elevated text-neutral-400 border border-site-border hover:text-white transition">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
@@ -73,7 +73,7 @@
                 {% endif %}
 
                 <!-- Мета-данные сбоку -->
-                <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 space-y-3">
+                <div class="bg-site-surface border border-site-border rounded-2xl p-4 space-y-3">
                     {% if game.release_year %}
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-neutral-500">Год выпуска</span>
@@ -91,7 +91,7 @@
                     {% if game.age_rating %}
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-neutral-500">Рейтинг</span>
-                        <span class="text-xs font-bold bg-neutral-700 text-neutral-200 px-2 py-0.5 rounded">{{ game.age_rating }}</span>
+                        <span class="text-xs font-bold bg-site-elevated text-neutral-200 px-2 py-0.5 rounded">{{ game.age_rating }}</span>
                     </div>
                     {% endif %}
 
@@ -121,7 +121,7 @@
                     <p class="text-xs text-neutral-500 mb-2 uppercase tracking-wider">Платформы</p>
                     <div class="flex flex-wrap gap-1.5">
                         {% for platform in game.platforms.all %}
-                        <span class="text-xs bg-neutral-800 border border-neutral-700 text-neutral-300 px-2.5 py-1 rounded-lg">
+                        <span class="text-xs bg-site-elevated border border-site-border text-neutral-300 px-2.5 py-1 rounded-lg">
                             {{ platform.short_name }}
                         </span>
                         {% endfor %}
@@ -150,7 +150,7 @@
                 {% endif %}
 
                 <!-- Разделитель -->
-                <div class="h-px bg-neutral-800 mb-6"></div>
+                <div class="h-px bg-site-elevated mb-6"></div>
 
                 <!-- Описание -->
                 {% if game.description %}
@@ -169,7 +169,7 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {% for screenshot in screenshots %}
                         <a href="{{ screenshot.image.url }}" target="_blank"
-                           class="relative rounded-xl overflow-hidden aspect-video group bg-neutral-900">
+                           class="relative rounded-xl overflow-hidden aspect-video group bg-site-surface">
                             <img src="{{ screenshot.image.url }}" alt="{{ screenshot.caption }}"
                                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"/>
                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition"></div>
@@ -194,7 +194,7 @@
 
 <!-- Похожие игры -->
 {% if similar_games %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-neutral-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-site-border">
     <h2 class="text-lg font-bold text-white mb-5">Похожие игры</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {% for sim_game in similar_games %}
@@ -223,14 +223,14 @@ if (favBtn) {
             isFav = data.is_favorite;
             const svg = this.querySelector('svg');
             if (isFav) {
-                this.className = this.className.replace(/bg-neutral-800 text-neutral-300 border-neutral-700 hover:text-red-400 hover:border-red-500\/40/, '');
+                this.className = this.className.replace(/bg-site-elevated text-neutral-300 border-site-border hover:text-red-400 hover:border-red-500\/40/, '');
                 this.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/40');
                 svg.setAttribute('fill', 'currentColor');
                 this.querySelector('span') ? this.querySelector('span').textContent = 'В избранном' : null;
                 this.innerHTML = this.innerHTML.replace('В избранное', 'В избранном');
             } else {
                 this.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/40');
-                this.classList.add('bg-neutral-800', 'text-neutral-300', 'border-neutral-700');
+                this.classList.add('bg-site-elevated', 'text-neutral-300', 'border-site-border');
                 svg.setAttribute('fill', 'none');
                 this.innerHTML = this.innerHTML.replace('В избранном', 'В избранное');
             }

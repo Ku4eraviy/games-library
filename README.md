@@ -1,120 +1,205 @@
-# 🎮 GameLib — Библиотека игр
+# GameLib — библиотека игр
 
-Персональная библиотека видеоигр на Django + PostgreSQL + Tailwind CSS.
+Сайт-каталог видеоигр: Django + PostgreSQL + Tailwind CSS.
 
-## Структура БД
+---
 
-| Таблица | Описание |
-|---------|----------|
-| `users_customuser` | Пользователи (расширение AbstractUser) |
-| `games_genre` | Жанры игр |
-| `games_platform` | Игровые платформы |
-| `games_developer` | Разработчики |
-| `games_game` | Основная таблица игр |
-| `games_game_genres` | M2M: игры ↔ жанры |
-| `games_game_platforms` | M2M: игры ↔ платформы |
-| `games_favoritegame` | Избранные игры пользователя |
-| `games_gamescreenshot` | Скриншоты игр |
+## Что нужно на компьютере
 
-## Связи
+1. **Python 3.10+** — [python.org/downloads](https://www.python.org/downloads/)  
+   При установке отметьте «Add Python to PATH».
 
-```
-Genre ←M2M→ Game ←FK→ Developer
-Platform ←M2M→ Game
-Game ←FK→ GameScreenshot
-CustomUser ←FK→ FavoriteGame ←FK→ Game
-```
+2. **PostgreSQL** — [postgresql.org/download](https://www.postgresql.org/download/)  
+   Запомните пароль пользователя `postgres` (ниже в примере — `admin`).
 
-## Быстрый старт
+3. **Git** (чтобы скачать проект) — [git-scm.com](https://git-scm.com/)
 
-### 1. Окружение и зависимости
+---
 
-Используется **одна** папка `venv/` (не создавайте `.venv` — будет путаница).
+## Запуск с нуля (Windows)
 
-**Windows (PowerShell):**
+Откройте **PowerShell** и выполняйте команды **по порядку**.
+
+### 1. Скачать проект и зайти в папку
+
 ```powershell
-cd gamelib
+cd C:\Users\Student\IS3\AFANASEV\ku4eryaviy\gamelib
+```
+
+*(Путь замените на свой, если проект лежит в другом месте.)*
+
+### 2. Создать базу данных PostgreSQL
+
+Откройте **pgAdmin** или **SQL Shell (psql)** и выполните:
+
+```sql
+CREATE DATABASE gamelib_db;
+```
+
+Пароль и логин по умолчанию в проекте:
+
+| Параметр | Значение |
+|----------|----------|
+| База     | `gamelib_db` |
+| Пользователь | `postgres` |
+| Пароль   | `admin` |
+| Хост     | `localhost` |
+| Порт     | `5432` |
+
+Если у вас другой пароль — измените его в файле `config/settings.py` (блок `DATABASES`).
+
+### 3. Виртуальное окружение и пакеты
+
+```powershell
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+После `activate` в начале строки появится `(venv)`.
+
+> Используйте **только** папку `venv`. Не создавайте вторую `.venv` — будет путаница.
+
+**Или одной командой** (миграции + игры в БД):
+
+```powershell
 .\setup.ps1
 venv\Scripts\activate
 ```
 
-**Вручную:**
-```bash
-cd gamelib
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
-pip install -r requirements.txt
-```
+### 4. Таблицы в базе
 
-### 3. Настроить PostgreSQL
-```sql
-CREATE DATABASE gamelib_db;
-CREATE USER gamelib_user WITH PASSWORD 'gamelib_password';
-GRANT ALL PRIVILEGES ON DATABASE gamelib_db TO gamelib_user;
-```
-
-Или через переменные окружения:
-```bash
-export DB_NAME=gamelib_db
-export DB_USER=gamelib_user
-export DB_PASSWORD=gamelib_password
-export DB_HOST=localhost
-export DB_PORT=5432
-```
-
-### 4. Применить миграции
-```bash
+```powershell
 python manage.py migrate
 ```
 
-### 5. Создать суперпользователя
-```bash
-python manage.py createsuperuser
-```
+### 5. Заполнить БД играми (обязательно)
 
-### 6. Заполнить тестовыми данными
-```bash
+```powershell
 python manage.py seed_data
 ```
 
-### 7. Запустить сервер
-```bash
+Команда создаёт:
+- 10 жанров, платформы, разработчиков;
+- **~50 игр** с нормальными описаниями на русском;
+- обложки со Steam / PlayStation CDN.
+
+Повторный запуск **обновит** описания и обложки, не сломает сайт.
+
+Обновить только обложки:
+
+```powershell
+python manage.py update_covers
+```
+
+### 6. Админка (один раз)
+
+```powershell
+python manage.py createsuperuser
+```
+
+Введите логин, email (можно пустой) и пароль.
+
+### 7. Запуск сервера
+
+```powershell
 python manage.py runserver
 ```
 
-Открыть в браузере: http://127.0.0.1:8000
+| Адрес | Что там |
+|-------|---------|
+| http://127.0.0.1:8000/ | Сайт с каталогом игр |
+| http://127.0.0.1:8000/admin/ | Админ-панель |
 
-Админ-панель: http://127.0.0.1:8000/admin/
+Остановить сервер: **Ctrl+C**.
 
-## Функциональность
+---
 
-- 📋 **Каталог игр** — карточки с обложками, жанрами, годом
-- 🔍 **Поиск** — по названию, описанию, разработчику
-- 🎛️ **Фильтры** — жанр, платформа, год выпуска
-- 📊 **Сортировка** — по дате, названию, рейтингу
-- 📄 **Страница игры** — подробная карточка, похожие игры
-- ❤️ **Избранное** — добавление/удаление через AJAX
-- 👤 **Авторизация** — регистрация, вход, выход
-- 🔧 **Админ-панель** — полное управление всеми данными
+## Краткая шпаргалка (каждый день)
 
-## Структура шаблонов
+```powershell
+cd C:\Users\Student\IS3\AFANASEV\ku4eryaviy\gamelib
+venv\Scripts\activate
+python manage.py runserver
+```
+
+---
+
+## Linux / macOS
+
+```bash
+cd gamelib
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py seed_data
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+---
+
+## Частые проблемы
+
+**`ModuleNotFoundError: image_uploader_widget`**  
+Не активировано окружение или не установлены пакеты:
+```powershell
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+**Ошибка подключения к PostgreSQL**  
+- PostgreSQL запущен? (служба в Windows)  
+- База `gamelib_db` создана?  
+- Пароль в `config/settings.py` совпадает с вашим?
+
+**На сайте нет игр**  
+```powershell
+python manage.py seed_data
+```
+
+**Коты / странные обложки**  
+```powershell
+python manage.py update_covers
+python manage.py seed_data
+```
+
+---
+
+## Что умеет сайт
+
+- Каталог игр с обложками, жанрами, годом
+- Поиск и фильтры (жанр, платформа, год)
+- Страница игры, похожие игры
+- Избранное (нужна регистрация)
+- Регистрация / вход
+- Админ-панель с загрузкой картинок и autoslug
+
+---
+
+## Структура проекта
 
 ```
-templates/
-├── base.html                    # Базовый шаблон
-├── partials/
-│   ├── header.html              # Навигация
-│   └── footer.html              # Подвал
-├── components/
-│   ├── game_card.html           # Карточка игры
-│   ├── filters.html             # Панель фильтров
-│   └── pagination.html          # Пагинация
-├── pages/
-│   ├── game_list.html           # Список игр
-│   ├── game_detail.html         # Карточка игры
-│   └── favorites.html           # Избранное
-└── registration/
-    ├── login.html               # Вход
-    └── register.html            # Регистрация
+gamelib/
+├── config/          # настройки Django
+├── games/           # игры, жанры, сиды
+├── users/           # пользователи
+├── templates/       # HTML-шаблоны
+├── manage.py
+├── requirements.txt
+├── setup.ps1        # быстрая установка (Windows)
+└── venv/            # виртуальное окружение (не в git)
+```
+
+---
+
+## Полезные команды
+
+```powershell
+python manage.py seed_data       # игры + описания в БД
+python manage.py update_covers   # только обложки
+python manage.py migrate         # применить миграции
+python manage.py createsuperuser # создать админа
+python manage.py runserver       # запустить сайт
 ```

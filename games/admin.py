@@ -19,6 +19,12 @@ class GenreAdmin(admin.ModelAdmin):
     list_display = ('icon', 'name', 'slug')
     search_fields = ('name',)
     ordering = ('name',)
+    readonly_fields = ('slug',)
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'icon', 'description'),
+        }),
+    )
 
 
 @admin.register(Platform)
@@ -55,10 +61,11 @@ class GameAdmin(ImageAdminMixin, admin.ModelAdmin):
     filter_horizontal = ('genres', 'platforms')
     list_editable = ('is_featured',)
     inlines = [GameScreenshotInline]
+    readonly_fields = ('slug',)
 
     fieldsets = (
         ('Основное', {
-            'fields': ('title', 'slug', 'short_description', 'description')
+            'fields': ('title', 'slug', 'short_description', 'description'),
         }),
         ('Медиа', {
             'fields': ('cover', 'cover_url', 'background_image')

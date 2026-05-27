@@ -3,7 +3,7 @@
     <input type="hidden" name="q" value="{{ search_query }}">
     {% endif %}
 
-    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-5 space-y-5">
+    <div class="bg-site-surface border border-site-border rounded-2xl p-5 space-y-5">
 
         <h3 class="text-sm font-semibold text-neutral-300 uppercase tracking-wider">Фильтры</h3>
 
@@ -12,12 +12,12 @@
             <label class="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">Жанр</label>
             <div class="space-y-1">
                 <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_platform %}platform={{ selected_platform }}&{% endif %}{% if selected_year %}year={{ selected_year }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}"
-                   class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition {% if not selected_genre %}bg-violet-600/20 text-violet-300{% else %}text-neutral-400 hover:text-white hover:bg-neutral-800{% endif %}">
+                   class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition {% if not selected_genre %}bg-violet-600/20 text-violet-300{% else %}text-neutral-400 hover:text-white hover:bg-site-elevated{% endif %}">
                     <span>🎮</span> Все жанры
                 </a>
                 {% for genre in genres %}
                 <a href="?{% if search_query %}q={{ search_query }}&{% endif %}genre={{ genre.slug }}{% if selected_platform %}&platform={{ selected_platform }}{% endif %}{% if selected_year %}&year={{ selected_year }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}"
-                   class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition {% if selected_genre == genre.slug %}bg-violet-600/20 text-violet-300{% else %}text-neutral-400 hover:text-white hover:bg-neutral-800{% endif %}">
+                   class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition {% if selected_genre == genre.slug %}bg-violet-600/20 text-violet-300{% else %}text-neutral-400 hover:text-white hover:bg-site-elevated{% endif %}">
                     <span>{{ genre.icon }}</span> {{ genre.name }}
                 </a>
                 {% endfor %}
@@ -28,7 +28,7 @@
         <div>
             <label class="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">Платформа</label>
             <select name="platform" onchange="this.form.submit()"
-                class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:border-violet-500">
+                class="w-full bg-site-elevated border border-site-border rounded-lg px-3 py-2 text-sm text-neutral-200 focus:border-violet-500">
                 <option value="">Все платформы</option>
                 {% for platform in platforms %}
                 <option value="{{ platform.id }}" {% if selected_platform == platform.id|stringformat:"s" %}selected{% endif %}>
@@ -42,7 +42,7 @@
         <div>
             <label class="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">Год выпуска</label>
             <select name="year" onchange="this.form.submit()"
-                class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:border-violet-500">
+                class="w-full bg-site-elevated border border-site-border rounded-lg px-3 py-2 text-sm text-neutral-200 focus:border-violet-500">
                 <option value="">Все годы</option>
                 {% for y in years %}
                 <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>
@@ -56,7 +56,7 @@
         <div>
             <label class="block text-xs font-medium text-neutral-500 mb-2 uppercase tracking-wider">Сортировка</label>
             <select name="sort" onchange="this.form.submit()"
-                class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:border-violet-500">
+                class="w-full bg-site-elevated border border-site-border rounded-lg px-3 py-2 text-sm text-neutral-200 focus:border-violet-500">
                 <option value="-release_year" {% if selected_sort == '-release_year' %}selected{% endif %}>Новые сначала</option>
                 <option value="release_year"  {% if selected_sort == 'release_year' %}selected{% endif %}>Старые сначала</option>
                 <option value="title"          {% if selected_sort == 'title' %}selected{% endif %}>Название А-Я</option>
